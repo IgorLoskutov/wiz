@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+  <html>
+    <head>
+      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script src="https://d3js.org/d3.v4.min.js"></script>
+      <style>
+        .nav ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          background-color: #555;
+        }
+
+        .nav li {
+          float: left;
+        }
+
+        .nav li a {
+          display: block;
+          color: white;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+        }
+
+        .nav li a:hover {
+          background-color: #000;
+        }
+
+        .bar {
+                    fill: steelblue;
+                }
+
+        .axis path,
+        .axis line {
+          fill: none;
+          stroke: #000;
+        }
+
+        path.domain {
+          stroke:  #000;
+        }
+
+        .y .tick line {
+          stroke: #ddd;
+        }
+      </style>
+    </head>
+  <body id="body">
+
+
+    <div id="nav" class="nav">
+      <ul>
+        <li><a href="{{url_for('index')}}">BarChart</a></li>
+        <li><a href="{{url_for('stacked')}}">Stacked</a></li>
+      </ul>
+    </div>
+    <div>
+     <input id="interval" type="number"
+            name="quantity" min="1" value="1"
+            style="width:50px; color: grey"
+            onChange="set_interval(this.value)"
+            placeholder="1">
+    </div>
+    <script>
+          function set_interval(val){
+            $("#svg").empty();
+            $("#svg").load("?interval="+val);
+            $(this).attr("placeholder", val);
+          }
+    </script>
+    <div id="svg">
+      {% block content %}{% endblock %}
+    </div>
+    <script>
+      $("#svg").load("?interval=1");
+    </script>
+
+  </body>
+  </html>

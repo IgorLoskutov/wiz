@@ -1,0 +1,94 @@
+
+<svg width="600" height="500"></svg>
+  <script>
+      var data = {{data|safe}};
+
+      var svg = d3.select("svg"),
+        margin = 200,
+        width = svg.attr("width") - margin,
+        height = svg.attr("height") - margin;
+
+      var xScale = d3.scaleBand().range ([0, width]).padding(0.4),
+          yScale = d3.scaleLinear().range ([height, 0]);
+
+      var g = svg.append("g")
+        .attr("transform", "translate(" + 100 + "," + 100 + ")");
+
+      var subgroups = ["a", "b", "c", "d", "e", "f"];
+
+      xScale.domain(data.map(function(d) { return d.interval; }));
+      yScale.domain([0,maxSum(data)]);
+      
+      var intervals = d3.map(data, function(d){return(d.interval)}).keys();
+
+      function sum( obj ) {
+        var sum = 0;
+        for( var el in obj ) {
+          if( obj.hasOwnProperty( el ) ) {
+            sum += parseFloat( obj[el] );
+          }
+        }
+        return sum-parseFloat(obj["interval"]);
+      }
+      
+      function maxSum(lst) {
+        var max = 0;
+        for( var i = 0; i < lst.length; i ++) {
+          if( max < sum(lst[i])){
+            max = sum(lst[i]);
+          }
+        }
+        return max;
+      }
+
+      g.append("g")
+       .attr("transform", "translate(0," + height + ")")
+       .call(d3.axisBottom(xScale).tickFormat(function(d){
+                     return d + 's';
+                 }).ticks())
+       .append("text")
+       .attr("y", height - 250)
+       .attr("x", width - 100)
+       .attr("text-anchor", "end")
+       .attr("stroke", "black")
+       .text("Time, sec");
+
+      g.append("g")
+        .call(d3.axisLeft(yScale))
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", "-5.1em")
+        .attr("text-anchor", "end")
+        .attr("stroke", "black")
+        .text("Quantity");
+
+      var color = d3.scaleOrdinal()
+        .domain(subgroups)
+        .range(["#fcd88a", "#cf7c1c", "#93c464", "#75734F", "#5eafc6", "#41a368"])
+
+      //stack the data? --> stack per subgroup
+      var stackedData = d3.stack()
+        .keys(subgroups)
+        (data)
+
+      g.append("g")
+        .selectAll("g")
+        // Enter in the stack data = loop key per key = group per group
+        .data(stackedData)
+        .enter().append("g")
+          .attr("fill", function(d) { return color(d.key); })
+          .selectAll("rect")
+          // enter a second time = loop subgroup per subgroup to add all rectangles
+          .data(function(d) { return d; })
+          .enter().append("rect")
+            .attr("x", function(d) { return xScale(d.data.interval); })
+            .attr("y", function(d) { return yScale(d[1]); })
+            .attr("width",xScale.bandwidth())
+            .attr("height", function(d) { 
+              console.log(yScale(d[0]) - yScale(d[1]));
+              return yScale(d[0]) - yScale(d[1]); })
+  </script>
+
+
+
