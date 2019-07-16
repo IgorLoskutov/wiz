@@ -24,3 +24,6 @@ in shell:
   python -m flask run
 
 
+
+visualization screenshot:
+d3js_barchart.png
